@@ -8,6 +8,8 @@ const City = props => {
     description: "",
     published: false
   };
+
+
   const [currentCity, setCurrentCity] = useState(initialCityState);
   const [message, setMessage] = useState("");
 

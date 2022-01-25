@@ -18,25 +18,6 @@ const findByTitle = (title) => {
 };
 
 
-
-// const API_URL = 'http://localhost:8080/api/v1/';
-//
-// const getAll = () => {
-//   return http.get(API_URL + 'cities');
-// };
-//
-// const get = (id) => {
-//   return http.get(API_URL + `cities/${id}`);
-// };
-//
-// const update = (id, data) => {
-//   return http.put(API_URL + `cities/${id}`, data);
-// };
-//
-// const findByTitle = (title) => {
-//   return http.get(API_URL + `cities?title=${title}`);
-// };
-
 const CityService = {
   getAll,
   get,

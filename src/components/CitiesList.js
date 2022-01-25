@@ -2,86 +2,107 @@ import React, { useState, useEffect, useMemo, useRef } from "react";
 import CityDataService from "../services/CityService";
 import { useTable } from "react-table";
 
-const CitiesList = (props) => {
-  const [cities, setCities] = useState([]);
-  const [searchName, setSearchName] = useState("");
-  const citiesRef = useRef();
+const TutorialsList = (props) => {
+  const [tutorials, setTutorials] = useState([]);
+  const [searchTitle, setSearchTitle] = useState("");
+  const tutorialsRef = useRef();
 
-  citiesRef.current = cities;
+  tutorialsRef.current = tutorials;
 
   useEffect(() => {
-    retrieveCities();
+    retrieveTutorials();
   }, []);
 
   const onChangeSearchTitle = (e) => {
-    const searchName = e.target.value;
-    setSearchName(searchName);
+    const searchTitle = e.target.value;
+    setSearchTitle(searchTitle);
   };
 
-  const retrieveCities = () => {
+  const retrieveTutorials = () => {
     CityDataService.getAll()
-      .then((response) => {
-        setCities(response.data);
-      })
-      .catch((e) => {
-        console.log(e);
-      });
+        .then((response) => {
+          setTutorials(response.data);
+        })
+        .catch((e) => {
+          console.log(e);
+        });
   };
 
-  // const refreshList = () => {
-  //   retrieveCities();
-  // };
+  const refreshList = () => {
+    retrieveTutorials();
+  };
 
   const findByTitle = () => {
-    CityDataService.findByTitle(searchName)
-      .then((response) => {
-        setCities(response.data);
-      })
-      .catch((e) => {
-        console.log(e);
-      });
+    CityDataService.findByTitle(searchTitle)
+        .then((response) => {
+          setTutorials(response.data);
+        })
+        .catch((e) => {
+          console.log(e);
+        });
   };
 
-  const openCity = (rowIndex) => {
-    const id = citiesRef.current[rowIndex].id;
+  const openTutorial = (rowIndex) => {
+    const id = tutorialsRef.current[rowIndex].id;
 
     props.history.push("/cities/" + id);
   };
 
+  // eslint-disable-next-line
+  const deleteTutorial = (rowIndex) => {
+    const id = tutorialsRef.current[rowIndex].id;
+
+    CityDataService.remove(id)
+        .then((response) => {
+          props.history.push("/cities");
+
+          let newTutorials = [...tutorialsRef.current];
+          newTutorials.splice(rowIndex, 1);
+
+          setTutorials(newTutorials);
+        })
+        .catch((e) => {
+          console.log(e);
+        });
+  };
+
   const columns = useMemo(
-    () => [
-      {
-        Header: "Id",
-        accessor: "id",
-      },
-      {
-        Header: "Title",
-        accessor: "name",
-      },
-      {
-        Header: "Title2",
-        accessor: "sex",
-      },
-      // {
-      //   Header: "Description",
-      //   accessor: "photo",
-      // },
-      {
-        Header: "Actions",
-        accessor: "actions",
-        Cell: (props) => {
-          const rowIdx = props.row.id;
-          return (
-            <div>
-              <span onClick={() => openCity(rowIdx)}>
+      () => [
+        {
+          Header: "Title",
+          accessor: "name",
+        },
+        {
+          Header: "Description",
+          accessor: "description",
+        },
+        {
+          Header: "Status",
+          accessor: "published",
+          Cell: (props) => {
+            return props.value ? "Published" : "Pending";
+          },
+        },
+        {
+          Header: "Actions",
+          accessor: "actions",
+          Cell: (props) => {
+            const rowIdx = props.row.id;
+            return (
+                <div>
+              <span onClick={() => openTutorial(rowIdx)}>
                 <i className="far fa-edit action mr-2"></i>
               </span>
-            </div>
-          );
+
+                  {/*<span onClick={() => deleteTutorial(rowIdx)}>*/}
+                  {/*  <i className="fas fa-trash action"></i>*/}
+                  {/*</span>*/}
+                </div>
+            );
+          },
         },
-      },
-    ],
-    []
+      ],
+      []
   );
 
   const {
@@ -92,66 +113,71 @@ const CitiesList = (props) => {
     prepareRow,
   } = useTable({
     columns,
-    data: cities,
+    data: tutorials,
   });
 
   return (
-    <div className="list row">
-      <div className="col-md-8">
-        <div className="input-group mb-3">
-          <input
-            type="text"
-            className="form-control"
-            placeholder="Search by name"
-            value={searchName}
-            onChange={onChangeSearchTitle}
-          />
-          <div className="input-group-append">
-            <button
-              className="btn btn-outline-secondary"
-              type="button"
-              onClick={findByTitle}
-            >
-              Search
-            </button>
+      <div className="list row">
+        <div className="col-md-8">
+          <div className="input-group mb-3">
+            <input
+                type="text"
+                className="form-control"
+                placeholder="Search by title"
+                value={searchTitle}
+                onChange={onChangeSearchTitle}
+            />
+            <div className="input-group-append">
+              <button
+                  className="btn btn-outline-secondary"
+                  type="button"
+                  onClick={findByTitle}
+              >
+                Search
+              </button>
+            </div>
           </div>
         </div>
-      </div>
-      <div className="col-md-12 list">
-        <table
-          className="table table-striped table-bordered"
-          {...getTableProps()}
-        >
-          <thead>
+        <div className="col-md-12 list">
+          <table
+              className="table table-striped table-bordered"
+              {...getTableProps()}
+          >
+            <thead>
             {headerGroups.map((headerGroup) => (
-              <tr {...headerGroup.getHeaderGroupProps()}>
-                {headerGroup.headers.map((column) => (
-                  <th {...column.getHeaderProps()}>
-                    {column.render("Header")}
-                  </th>
-                ))}
-              </tr>
+                <tr {...headerGroup.getHeaderGroupProps()}>
+                  {headerGroup.headers.map((column) => (
+                      <th {...column.getHeaderProps()}>
+                        {column.render("Header")}
+                      </th>
+                  ))}
+                </tr>
             ))}
-          </thead>
-          <tbody {...getTableBodyProps()}>
+            </thead>
+            <tbody {...getTableBodyProps()}>
             {rows.map((row, i) => {
               prepareRow(row);
               return (
-                <tr {...row.getRowProps()}>
-                  {row.cells.map((cell) => {
-                    return (
-                      <td {...cell.getCellProps()}>{cell.render("Cell")}</td>
-                    );
-                  })}
-                </tr>
+                  <tr {...row.getRowProps()}>
+                    {row.cells.map((cell) => {
+                      return (
+                          <td {...cell.getCellProps()}>{cell.render("Cell")}</td>
+                      );
+                    })}
+                  </tr>
               );
             })}
-          </tbody>
-        </table>
-      </div>
+            </tbody>
+          </table>
+        </div>
 
-    </div>
+        {/*<div className="col-md-8">*/}
+        {/*  <button className="btn btn-sm btn-danger" onClick={removeAllTutorials}>*/}
+        {/*    Remove All*/}
+        {/*  </button>*/}
+        {/*</div>*/}
+      </div>
   );
 };
 
-export default CitiesList;
+export default TutorialsList;
