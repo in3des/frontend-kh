@@ -13,8 +13,8 @@ import BoardAdmin from "./components/board-admin.component";
 
 // import AuthVerify from "./common/auth-verify";
 import EventBus from "./common/EventBus";
-import CitiesList from "./components/CitiesList";
-import City from "./components/City";
+import CitiesList from "./components/TutorialsList";
+import City from "./components/Tutorial";
 
 class App extends Component {
   constructor(props) {
@@ -125,7 +125,6 @@ class App extends Component {
           <Switch>
             <Route exact path={["/", "/home"]} component={Home} />
             <Route exact path="/login" component={Login} />
-            {/*<Route exact path="/profile" component={Profile} />*/}
             <Route exact path={["/", "/cities"]} component={CitiesList} />
             <Route path="/cities/:id" component={City} />
             <Route path="/user" component={BoardUser} />
